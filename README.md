@@ -9,7 +9,7 @@ src/validate_on_lfw.py # For threshold judgement
 ```
 
 # Requirements
-This project is runne with python2.7.12. Here are python requirements:
+This project is implemented with python2.7.12. Here are python requirements:
 ```
 tensorflow==1.3.0
 scipy
@@ -69,17 +69,18 @@ $ python contributed/get_emb_array.py \
 
 It can output embeddings of test images to `.npy` file, and recording running time at the same time.
 Then it will call `contributed/search_acc.py` module for **top-n analysis**.
-As reference, here is executation time of my machine with Intel i5-6500, NVIDIA 1080 GPU:
-> Export embedding time
-> Forward pass 7978 images takes 48.93 seconds
-> Forward pass 7978 images takes 48.84 seconds
-> Forward pass 7978 images takes 48.14 seconds
->
-> Search time
-> It takes 248.58 seconds to search 7978 images
-> It takes 244.38 seconds to search 7978 images
-> It takes 229.45 seconds to search 7978 images
+s reference, here is executation time of my machine with Intel i5-6500, NVIDIA 1080 GPU:
+```
+Export embedding time
+Forward pass 7978 images takes 48.93 seconds
+Forward pass 7978 images takes 48.84 seconds
+Forward pass 7978 images takes 48.14 seconds
 
+Search time
+It takes 248.58 seconds to search 7978 images
+It takes 244.38 seconds to search 7978 images
+It takes 229.45 seconds to search 7978 images
+```
 The output file like `20171202-234221_emb.npy` and `20171202-234221_emb_paths.txt` file can be used to show searched images. The way to use them is using `search_acc.py` module:
 ```python
 >>> from contributed.search_acc import SearchFabric
