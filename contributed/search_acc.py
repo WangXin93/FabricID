@@ -1,6 +1,6 @@
 ###############################################################################
-# Author: Wang X
-# Function: Input embeddings to get the search accuracy
+# Author: Wang Xin                                                            #
+# Function: Input embeddings to get the search accuracy                       #
 ###############################################################################
 
 from __future__ import print_function

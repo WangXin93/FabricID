@@ -1,3 +1,7 @@
+###############################################################################
+# Author: Wang Xin                                                            #
+# Function: Input embeddings to get the search accuracy                       #
+###############################################################################
 
 from __future__ import absolute_import
 from __future__ import division
@@ -97,4 +101,3 @@ def parse_arguments(args):
 
 if __name__ == '__main__':
     main(parse_arguments(sys.argv[1:]))
-            

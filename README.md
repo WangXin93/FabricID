@@ -1,51 +1,117 @@
-# Face Recognition using Tensorflow [![Build Status][travis-image]][travis]
+# Fabric Identification using CNN
+This is my experiment **fabric identification** based on **[face recognition](https://github.com/davidsandberg/facenet)**.
+My working modules mainly includes:
+```
+src/train_softmax.py # For train
+contributed/get_emb_array.py # For top-n analysis
+contributed/search_acc.py # For top-n analysis
+src/validate_on_lfw.py # For threshold judgement
+```
 
-[travis-image]: http://travis-ci.org/davidsandberg/facenet.svg?branch=master
-[travis]: http://travis-ci.org/davidsandberg/facenet
+# Requirements
+This project is runne with python2.7.12. Here are python requirements:
+```
+tensorflow==1.3.0
+scipy
+scikit-learn
+opencv-python
+h5py
+matplotlib
+Pillow
+requests
+```
+Fabircs dataset should be organized with this structure:
+```
+/path/to/crop1600resize299
+├── test
+│   ├── A03031-1600080-1
+│   │   ├── A03031-1600080-1_0000.jpg
+│   │   └── A03031-1600080-1_0001.jpg
+│   ├── A04033-1600003-3
+│   │   ├── A04033-1600003-3_0000.jpg
+│   │   └── A04033-1600003-3_0001.jpg
+│   └── ...
+├── train
+│   ├── A004041-1701263-2
+│   │   ├── A004041-1701263-2_0000.jpg
+│   │   └── A004041-1701263-2_0001.jpg
+│   ├── A03031-1600255-1
+│   │   ├── A03031-1600255-1_0000.jpg
+│   │   └── A03031-1600255-1_0001.jpg
+│   └── ...
+├── val
+│   ├── A03031-1600080-1
+│   │   ├── A03031-1600080-1_0000.jpg
+│   │   └── A03031-1600080-1_0001.jpg
+│   ├── A04033-1600003-3
+│   │   ├── A04033-1600003-3_0000.jpg
+│   │   └── A04033-1600003-3_0001.jpg
+│   └── ...
+```
 
-This is a TensorFlow implementation of the face recognizer described in the paper
-["FaceNet: A Unified Embedding for Face Recognition and Clustering"](http://arxiv.org/abs/1503.03832). The project also uses ideas from the paper ["A Discriminative Feature Learning Approach for Deep Face Recognition"](http://ydwen.github.io/papers/WenECCV16.pdf) as well as the paper ["Deep Face Recognition"](http://www.robots.ox.ac.uk/~vgg/publications/2015/Parkhi15/parkhi15.pdf) from the [Visual Geometry Group](http://www.robots.ox.ac.uk/~vgg/) at Oxford.
+# Train
+Start train is easy using this script:
+```
+$ sh ./train.sh
+```
 
-## Compatibility
-The code is tested using Tensorflow r1.2 under Ubuntu 14.04 with Python 2.7 and Python 3.5. The test cases can be found [here](https://github.com/davidsandberg/facenet/tree/master/test) and the results can be found [here](http://travis-ci.org/davidsandberg/facenet).
+# Export embeddings and top-n analysis
+```bash
+export PYTHONPATH=src
+$ python contributed/get_emb_array.py \
+  --lfw_dir /media/wangx/HDD1/yarn-dyed-fabric/crop1600resize224/val \
+  --model_dir /home/wangx/models/yarn-dyed-fabric/20171202-234221
+```
+    --lfw_dir: Directroy store test images
+    --model_dir: Directroy checkpoint and meta files
 
-## News
-| Date     | Update |
-|----------|--------|
-| 2017-05-13 | Removed a bunch of older non-slim models. Moved the last bottleneck layer into the respective models. Corrected normalization of Center Loss. |
-| 2017-05-06 | Added code to [train a classifier on your own images](https://github.com/davidsandberg/facenet/wiki/Train-a-classifier-on-own-images). Renamed facenet_train.py to train_tripletloss.py and facenet_train_classifier.py to train_softmax.py. |
-| 2017-03-02 | Added pretrained models that generate 128-dimensional embeddings.|
-| 2017-02-22 | Updated to Tensorflow r1.0. Added Continuous Integration using Travis-CI.|
-| 2017-02-03 | Added models where only trainable variables has been stored in the checkpoint. These are therefore significantly smaller. |
-| 2017-01-27 | Added a model trained on a subset of the MS-Celeb-1M dataset. The LFW accuracy of this model is around 0.994. |
-| 2017&#8209;01&#8209;02 | Updated to code to run with Tensorflow r0.12. Not sure if it runs with older versions of Tensorflow though.   |
+It can output embeddings of test images to `.npy` file, and recording running time at the same time.
+Then it will call `contributed/search_acc.py` module for **top-n analysis**.
+As reference, here is executation time of my machine with Intel i5-6500, NVIDIA 1080 GPU:
+> Export embedding time
+> Forward pass 7978 images takes 48.93 seconds
+> Forward pass 7978 images takes 48.84 seconds
+> Forward pass 7978 images takes 48.14 seconds
+>
+> Search time
+> It takes 248.58 seconds to search 7978 images
+> It takes 244.38 seconds to search 7978 images
+> It takes 229.45 seconds to search 7978 images
 
-## Pre-trained models
-| Model name      | LFW accuracy | Training dataset | Architecture |
-|-----------------|--------------|------------------|-------------|
-| [20170511-185253](https://drive.google.com/file/d/0B5MzpY9kBtDVOTVnU3NIaUdySFE) | 0.987        | CASIA-WebFace    | [Inception ResNet v1](https://github.com/davidsandberg/facenet/blob/master/src/models/inception_resnet_v1.py) |
-| [20170512-110547](https://drive.google.com/file/d/0B5MzpY9kBtDVZ2RpVDYwWmxoSUk) | 0.992        | MS-Celeb-1M      | [Inception ResNet v1](https://github.com/davidsandberg/facenet/blob/master/src/models/inception_resnet_v1.py) |
+The output file like `20171202-234221_emb.npy` and `20171202-234221_emb_paths.txt` file can be used to show searched images. The way to use them is using `search_acc.py` module:
+```python
+>>> from contributed.search_acc import SearchFabric
+>>> emb_array = '/path/to20171202-234221_emb.npy'
+>>> paths = '/path/to20171202-234221_emb_paths.txt'
+>>> search = SearchFabric(paths, emb_array)
+>>> search.show_search(0)
+```
+![img](show_search0.png)
 
-## Inspiration
-The code is heavily inspired by the [OpenFace](https://github.com/cmusatyalab/openface) implementation.
+# Evaluate performance
+For **threshold judgement**, execute:
+```
+$ sh ./valid.sh
+```
 
-## Training data
-The [CASIA-WebFace](http://www.cbsr.ia.ac.cn/english/CASIA-WebFace-Database.html) dataset has been used for training. This training set consists of total of 453 453 images over 10 575 identities after face detection. Some performance improvement has been seen if the dataset has been filtered before training. Some more information about how this was done will come later.
-The best performing model has been trained on a subset of the [MS-Celeb-1M](https://www.microsoft.com/en-us/research/project/ms-celeb-1m-challenge-recognizing-one-million-celebrities-real-world/) dataset. This dataset is significantly larger but also contains significantly more label noise, and therefore it is crucial to apply dataset filtering on this dataset.
+# Conclusion
+The best performance appears when propressing fabric images by **crop 1600x1600 area then resize to 224**. As reference, my top-n analysis and `valid.sh` result of experiment are shown here:
+```
+# top-n analysis
+The top 1 accuracy is 0.998871897719
+The top 2 accuracy is 0.999623965906
+The top 3 accuracy is 1.0
+The top 4 accuracy is 1.0
+The top 5 accuracy is 1.0
+The top 6 accuracy is 1.0
+The top 7 accuracy is 1.0
+The top 8 accuracy is 1.0
+The top 9 accuracy is 1.0
+The top 10 accuracy is 1.0
 
-## Pre-processing
-
-### Face alignment using MTCNN
-One problem with the above approach seems to be that the Dlib face detector misses some of the hard examples (partial occlusion, silhouettes, etc). This makes the training set to "easy" which causes the model to perform worse on other benchmarks.
-To solve this, other face landmark detectors has been tested. One face landmark detector that has proven to work very well in this setting is the
-[Multi-task CNN](https://kpzhang93.github.io/MTCNN_face_detection_alignment/index.html). A Matlab/Caffe implementation can be found [here](https://github.com/kpzhang93/MTCNN_face_detection_alignment) and this has been used for face alignment with very good results. A Python/Tensorflow implementation of MTCNN can be found [here](https://github.com/davidsandberg/facenet/tree/master/src/align). This implementation does not give identical results to the Matlab/Caffe implementation but the performance is very similar.
-
-## Running training
-Currently, the best results are achieved by training the model as a classifier with the addition of [Center loss](http://ydwen.github.io/papers/WenECCV16.pdf). Details on how to train a model as a classifier can be found on the page [Classifier training of Inception-ResNet-v1](https://github.com/davidsandberg/facenet/wiki/Classifier-training-of-inception-resnet-v1).
-
-## Pre-trained model
-### Inception-ResNet-v1 model
-A couple of pretrained models are provided. They are trained using softmax loss with the Inception-Resnet-v1 model. The datasets has been aligned using [MTCNN](https://github.com/davidsandberg/facenet/tree/master/src/align).
-
-## Performance
-The accuracy on LFW for the model [20170512-110547](https://drive.google.com/file/d/0B5MzpY9kBtDVZ2RpVDYwWmxoSUk) is 0.992+-0.003. A description of how to run the test can be found on the page [Validate on LFW](https://github.com/davidsandberg/facenet/wiki/Validate-on-lfw).
+# sh ./valis.sh
+Accuracy: 1.000+-0.001
+Validation rate: 0.99975+-0.00075 @ FAR=0.00126
+Area Under Curve (AUC): 1.000
+Equal Error Rate (EER): 0.000
+```
