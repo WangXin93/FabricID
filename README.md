@@ -48,6 +48,8 @@ Fabircs dataset should be organized with this structure:
 │   │   └── A04033-1600003-3_0001.jpg
 │   └── ...
 ```
+Fabric images are look like this:
+![fabric](original_images_small.jpg)
 
 # Train
 Start train is easy using this script:
