@@ -69,12 +69,15 @@ $ python contributed/get_emb_array.py \
 
 It can output embeddings of test images to `.npy` file, and recording running time at the same time.
 Then it will call `contributed/search_acc.py` module for **top-n analysis**.
-s reference, here is executation time of my machine with Intel i5-6500, NVIDIA 1080 GPU:
+s reference, here is **executation time** of my machine with Intel i5-6500, NVIDIA 1080 GPU:
 ```
 Export embedding time
-Forward pass 7978 images takes 48.93 seconds
-Forward pass 7978 images takes 48.84 seconds
-Forward pass 7978 images takes 48.14 seconds
+Forward pass 7978 images takes 48.93 seconds # inception-resnet-v1 model
+Forward pass 7978 images takes 48.84 seconds # inception-resnet-v1 model
+Forward pass 7978 images takes 48.14 seconds # inception-resnet-v1 model
+Forward pass 7978 images takes 32.55 seconds # squeezenet model
+Forward pass 7978 images takes 34.18 seconds # squeezenet model
+Forward pass 7978 images takes 33.86 seconds # squeezenet model
 
 Search time
 It takes 248.58 seconds to search 7978 images
