@@ -1,6 +1,11 @@
 # Fabric Identification using CNN
+
+# News
+* 2019-05-17: My paper [Fabric Identification Using Convolutional Neural Network](https://link.springer.com/chapter/10.1007%2F978-3-319-99695-0_12) about this work  has been accepted in [AIFT 2018](https://www.polyu.edu.hk/itc/aift2018/index.html).
+
+# Usage
 This is my experiment **fabric identification** based on **[face recognition](https://github.com/davidsandberg/facenet)**.
-My working modules mainly includes:
+, My working modules mainly includes:
 ```
 src/train_softmax.py # For train
 contributed/get_emb_array.py # For top-n analysis
